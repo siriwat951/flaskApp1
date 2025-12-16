@@ -8,6 +8,7 @@ from urllib.request import urlopen
 from flask import jsonify
 from app import app
 from flask import Flask, render_template
+from datetime import datetime
 
 
 def read_web_page(url):
@@ -16,12 +17,9 @@ def read_web_page(url):
         return res.read()
 
 
-
 @app.route('/weather')
 def hw01_localweather():
     return app.send_static_file('hw01_localweather.html')
-
-
 
 
 @app.route("/api/weather")
@@ -43,5 +41,81 @@ def api_weather():
         'current': CSet,
         'next_hr': NSet
     }
+
+    return jsonify(data)
+
+
+@app.route("/hw03/prcp/")
+def hw03_prcp():
+    url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=7.0084&longitude=100.4767&start_date=2025-11-01&end_date=2025-12-07&daily=precipitation_hours&timezone=Asia%2FBangkok"
+    response = read_web_page(url)
+    data_json = json.loads(response)
+    daily = data_json["daily"]
+    prev = None
+
+    data = []
+    for prcp1, prcp2 in zip(daily["time"], daily["precipitation_hours"]):
+        date = datetime.strptime(prcp1, "%Y-%m-%d")
+        day = date.strftime('%a')[:2]
+        THEmonth = str(date.month)
+        month = datetime.strptime(THEmonth, '%m').strftime("%b") 
+
+        curr = prcp2
+        if prev == None:
+            arrow = ""
+        elif curr > prev:
+            arrow = "↑"
+        elif curr < prev:
+            arrow = "↓"
+        else:
+            arrow = "↔"
+        prev = curr
+
+        data.append({
+            "year": date.year,
+            "month": month,
+            "day": date.day,
+            "weekday": day,
+            "prcp": prcp2,
+            "arrow": arrow
+        })
+
+    return render_template('lab03/hw03_prcp.html', data=data)
+
+
+@app.route("/api/hw3")
+def apihw3():
+    url = "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=7.0084&longitude=100.4767&start_date=2025-11-01&end_date=2025-12-07&daily=precipitation_hours&timezone=Asia%2FBangkok"
+    response = read_web_page(url)
+    data_json = json.loads(response)
+    daily = data_json["daily"]
+    prev = None
+
+    data = []
+    for prcp1, prcp2 in zip(daily["time"], daily["precipitation_hours"]):
+        date = datetime.strptime(prcp1, "%Y-%m-%d")
+        day = date.strftime('%a')[:2]
+        THEmonth = str(date.month)
+        month = datetime.strptime(THEmonth, '%m').strftime("%b") 
+
+        curr = prcp2
+        if prev is None:
+            arrow = ""
+        elif curr > prev:
+            arrow = "↑"
+        elif curr < prev:
+            arrow = "↓"
+        else:
+            arrow = "↔"
+        prev = curr
+
+        data.append({
+            "year": date.year,
+            "month": month,
+            "day": date.day,
+            "weekday": day,
+            "prcp": prcp2,
+            "arrow": arrow
+        })
 
     return jsonify(data)
