@@ -54,7 +54,7 @@ def hw03_prcp():
     prev = None
 
     data = []
-    for prcp1, prcp2 in zip(daily["time"], daily["precipitation_hours"]):
+    for prcp1, prcp2 in zip(daily["time"], daily["precipitation_sum"]):
         date = datetime.strptime(prcp1, "%Y-%m-%d")
         day = date.strftime('%a')[:2]
         THEmonth = str(date.month)
@@ -92,7 +92,7 @@ def apihw3():
     prev = None
 
     data = []
-    for prcp1, prcp2 in zip(daily["time"], daily["precipitation_hours"]):
+    for prcp1, prcp2 in zip(daily["time"], daily["precipitation_sum"]):
         date = datetime.strptime(prcp1, "%Y-%m-%d")
         day = date.strftime('%a')[:2]
         THEmonth = str(date.month)
