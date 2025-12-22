@@ -1,0 +1,147 @@
+body {
+    background-color: #e7ecf0;
+}
+
+
+nav {
+    background-color: #ffffff;
+    border-bottom: 1px solid #adb1b4;
+    margin-bottom: 10px;
+    height: 70px;
+    align-items: center;
+}
+
+
+nav .container {
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+}
+
+
+.navbar a {
+    text-decoration: none;
+    color: #7f7f7f;
+    margin-left: 15px;
+    font-family: Arial;
+    align-items: center;
+}
+
+
+img.tw-user-small {
+    height: 40px;
+    clip-path: circle(40%);
+}
+
+
+img.tw-user-medium {
+    height: 50px;
+    clip-path: circle(50%);
+}
+
+
+form.form-inline {
+    display: flex;
+    padding-right: 15px;
+}
+
+#nav-search {
+    border-radius: 20px;
+    background-color: #e7ecf0;
+}
+
+
+#nav-tweet-btn {
+    border-radius: 20px;
+    background-color: #67b1f9;
+    color: #ffffff;
+}
+
+
+.row {
+    display: flex; 
+    justify-content: space-between;
+    
+}
+
+
+#left_3{
+    padding-left: 15px;
+    font-family: Arial;
+    align-items: center;
+}
+
+#center_6{
+    display: flex;
+    font-family: Arial;
+}
+
+#right_3{
+    padding-right: 15px;
+    font-family: Arial;
+    align-items: center;
+}
+
+
+.content-box {
+    display: flex;
+    background-color: #ffffff;
+    margin-bottom: 10px;
+    min-width: 300px;
+    min-height: 30px;
+    align-items: center;
+}
+
+.new-tweet-row {
+    display: flex;
+    background-color: #eaf5fe;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    width: 500px;
+}
+
+#tweet-input {
+    min-width: 420px;
+    min-height: 40px;
+    margin-right: 20px;
+    align-items: center;
+}
+
+.tweet {
+    background-color: #ffffff;
+    border-bottom: 1px solid #edf1f4;
+    width: 33%;
+    padding-bottom: 15px;
+    padding-top: 15px;
+    display: flex;
+    margin:auto;
+}
+
+
+.tweet-username {
+    font-weight: bold;
+}
+
+
+.tweet-arrow {
+    padding-right: 25px;
+}
+
+
+.tweet-text,
+.tweet-media {
+    padding-right: 10px;
+}
+
+
+.tweet .row {
+    display: flex;
+    justify-content: left; 
+    width: 50%;
+}
+
+.tweet .tw-user-medium. {
+    display: flex;
+    justify-content: left;
+}
