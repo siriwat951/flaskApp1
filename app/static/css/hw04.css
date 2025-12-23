@@ -1,0 +1,21 @@
+.icon-good {
+   background-image: url('../ico/good.png');
+   background-size: contain; 
+   background-repeat: no-repeat;
+   background-position: center center;
+   display: inline-block; 
+   width: 90%; 
+   height: 0; 
+   padding-bottom: 60%; /* Maintains aspect ratio */
+   margin: auto; 
+}
+
+div.card-body{
+ background-color: rgb(226, 226, 226);
+ align-items: center;
+}
+
+.greenbox{
+   background-color: #00E400;
+   align-items: center;
+}
