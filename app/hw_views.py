@@ -119,3 +119,7 @@ def apihw3():
         })
 
     return jsonify(data)
+    
+@app.route("/hw04")
+hw04_rwd()
+    return app.send_static_file('hw04_rwd.html')
