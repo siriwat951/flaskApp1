@@ -4,6 +4,7 @@
 
 
 import json
+from urllib import response
 from urllib.request import urlopen
 from flask import jsonify
 from app import app
@@ -120,6 +121,228 @@ def apihw3():
 
     return jsonify(data)
     
+    
 @app.route("/hw04")
-def hw04_rwd()
+def hw04_rwd():
     return app.send_static_file('hw04_rwd.html')
+
+
+def get_quality_class(avg):
+    if avg <= 50:
+        return "good"
+    elif avg <= 100:
+        return "moderate"
+    elif avg <= 150:
+        return "unhealthy-sensitive"
+    elif avg <= 200:
+        return "unhealthy"
+    elif avg <= 300:
+        return "very-unhealthy"
+    else:
+        return "hazardous"
+
+
+@app.route("/api/hw05")
+def apihw5():
+    urlB = "https://api.waqi.info/feed/here/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseB = read_web_page(urlB)
+    data_jsonB = json.loads(responseB)
+
+    forecastB = []
+
+    pm25_dailyB = data_jsonB['data']['forecast']['daily']['pm25']
+
+    for i in range(1, 4):
+        avg = pm25_dailyB[i]['avg']
+        
+        forecastB.append({
+            "aqi": avg,
+            "day": pm25_dailyB[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataB = {
+    "aqi": data_jsonB['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": data_jsonB['data']['city']['name'],
+    "date": data_jsonB['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastB
+    }
+
+    urlC = "https://api.waqi.info/feed/@5775/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseC = read_web_page(urlC)
+    data_jsonC = json.loads(responseC)
+
+    forecastC = []
+    pm25_dailyC = data_jsonC['data']['forecast']['daily']['pm25']
+
+    for i in range(1, 4):
+        avg = pm25_dailyC[i]['avg']
+        
+        forecastC.append({
+            "aqi": avg,
+            "day": pm25_dailyC[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataC = {
+    "aqi": data_jsonC['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": data_jsonC['data']['city']['name'],
+    "date": data_jsonC['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastC
+    }
+
+    urlU = "https://api.waqi.info/feed/@12797/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseU = read_web_page(urlU)
+    data_jsonU = json.loads(responseU)
+
+    forecastU = []
+    pm25_dailyU = data_jsonU['data']['forecast']['daily']['pm25']
+    for i in range(1, 4):
+        avg = pm25_dailyU[i]['avg']
+
+        forecastU.append({
+            "aqi": avg,
+            "day": pm25_dailyU[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataU = {
+    "aqi": data_jsonU['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": 'Ubon Ratchathani',
+    "date": data_jsonU['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastU
+    }
+
+    urlP = "https://api.waqi.info/feed/@1827/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseP = read_web_page(urlP)
+    data_jsonP = json.loads(responseP)
+
+    forecastP = []
+    pm25_dailyP = data_jsonP['data']['forecast']['daily']['pm25']
+    for i in range(1, 4):
+        avg = pm25_dailyP[i]['avg']
+
+        forecastP.append({
+            "aqi": avg,
+            "day": pm25_dailyP[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataP = {
+    "aqi": data_jsonP['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": 'Phuket',
+    "date": data_jsonP['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastP
+    }
+
+    dataall = {
+        'Chiang_Mai': dataC,
+        'Ubon': dataU,
+        'Bangkok': dataB,
+        'Phuket': dataP
+    }
+
+    return jsonify(dataall)
+
+
+@app.route("/hw05/aqicard")
+def hw05_aqicard():
+    urlB = "https://api.waqi.info/feed/here/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseB = read_web_page(urlB)
+    data_jsonB = json.loads(responseB)
+
+    forecastB = []
+
+    pm25_dailyB = data_jsonB['data']['forecast']['daily']['pm25']
+
+    for i in range(1, 4):
+        avg = pm25_dailyB[i]['avg']
+        
+        forecastB.append({
+            "aqi": avg,
+            "day": pm25_dailyB[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataB = {
+    "aqi": data_jsonB['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": data_jsonB['data']['city']['name'],
+    "date": data_jsonB['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastB
+    }
+
+    urlC = "https://api.waqi.info/feed/@5775/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseC = read_web_page(urlC)
+    data_jsonC = json.loads(responseC)
+
+    forecastC = []
+    pm25_dailyC = data_jsonC['data']['forecast']['daily']['pm25']
+
+    for i in range(1, 4):
+        avg = pm25_dailyC[i]['avg']
+        
+        forecastC.append({
+            "aqi": avg,
+            "day": pm25_dailyC[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataC = {
+    "aqi": data_jsonC['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": data_jsonC['data']['city']['name'],
+    "date": data_jsonC['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastC
+    }
+
+    urlU = "https://api.waqi.info/feed/@12797/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseU = read_web_page(urlU)
+    data_jsonU = json.loads(responseU)
+
+    forecastU = []
+    pm25_dailyU = data_jsonU['data']['forecast']['daily']['pm25']
+    for i in range(1, 4):
+        avg = pm25_dailyU[i]['avg']
+
+        forecastU.append({
+            "aqi": avg,
+            "day": pm25_dailyU[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataU = {
+    "aqi": data_jsonU['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": 'Ubon Ratchathani',
+    "date": data_jsonU['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastU
+    }
+
+    urlP = "https://api.waqi.info/feed/@1827/?token=5881668d3bc2c2b7a4186d643095627c584ba14c"
+    responseP = read_web_page(urlP)
+    data_jsonP = json.loads(responseP)
+
+    forecastP = []
+    pm25_dailyP = data_jsonP['data']['forecast']['daily']['pm25']
+    for i in range(1, 4):
+        avg = pm25_dailyP[i]['avg']
+
+        forecastP.append({
+            "aqi": avg,
+            "day": pm25_dailyP[i]['day'],
+            "quality-class": get_quality_class(avg)
+        })
+
+    dataP = {
+    "aqi": data_jsonP['data']['forecast']['daily']['pm25'][0]['avg'],
+    "city": 'Phuket',
+    "date": data_jsonP['data']['forecast']['daily']['pm25'][0]['day'],
+    "forecast": forecastP
+    }
+
+    dataall = {
+        'Chiang_Mai': dataC,
+        'Ubon': dataU,
+        'Bangkok': dataB,
+        'Phuket': dataP
+    }
+
+    return render_template('hw05_aqicard.html', data=dataall)

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--Siriwat Tidsuksai 670510727-->
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/hw04.css') }}">
+
+    <title>HW04</title>
+</head>
+
+<body>
+    {% set CM = data['Chiang_Mai'] %}
+    {% set CM_class = CM.forecast[0]['quality-class'] %}
+    {% set UR = data['Ubon'] %}
+    {% set UR_class = UR.forecast[0]['quality-class'] %}
+    {% set BK = data['Bangkok'] %}
+    {% set BK_class = BK.forecast[0]['quality-class'] %}
+    {% set PK = data['Phuket'] %}
+    {% set PK_class = PK.forecast[0]['quality-class'] %}
+    {% set label = {
+    'good': 'Good',
+    'moderate': 'Moderate',
+    'unhealthy-sensitive': 'Unhealthy for Sensitive Groups',
+    'unhealthy': 'Unhealthy',
+    'very-unhealthy': 'Very Unhealthy',
+    'hazardous': 'Hazardous'
+    } %}
+    
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="card-header">
+                <p class="location-name"> Chiang Mai air quality index</p>
+            </div>
+            <div class="card-body {{ CM_class }}">
+                <div class="row">
+                    <div class="col">
+                        <p class="day-value">{{ CM.date }}</p>
+                        <h2 class="aqi-value">{{ CM.aqi }}</h2>
+                        <br></br>
+                        <h4 class="aqi-status">{{ label[CM_class] }}</h4>
+                    </div>
+                    <div class="col">
+                        <span class="icon-{{ CM_class }}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    {% for f in CM.forecast %}
+                    <div class="col day">
+                        <p>{{ f.day[5:] }}</p>
+                        <span class="col-badge {{ f['quality-class'] }}">
+                            {{ f.aqi }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-3">
+            <div class="card-header">
+                <p class="location-name"> Ubon Ratchathani air quality index</p>
+            </div>
+            <div class="card-body {{ UR_class }}">
+                <div class="row">
+                    <div class="col">
+                        <p class="day-value">{{ UR.date }}</p>
+                        <h2 class="aqi-value">{{ UR.aqi }}</h2>
+                        <br></br>
+                        <h4 class="aqi-status">{{ label[UR_class] }}</h4>
+                    </div>
+                    <div class="col">
+                        <span class="icon-{{ UR_class }}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    {% for f in UR.forecast %}
+                    <div class="col day">
+                        <p>{{ f.day[5:] }}</p>
+                        <span class="col-badge {{ f['quality-class'] }}">
+                            {{ f.aqi }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="card-header">
+                <p class="location-name"> Phuket air quality index</p>
+            </div>
+            <div class="card-body {{ PK_class }}">
+                <div class="row">
+                    <div class="col">
+                        <p class="day-value">{{ PK.date }}</p>
+                        <h2 class="aqi-value">{{ PK.aqi }}</h2>
+                        <br></br>
+                        <h4 class="aqi-status">{{ label[PK_class] }}</h4>
+                    </div>
+                    <div class="col">
+                        <span class="icon-{{ PK_class }}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    {% for f in PK.forecast %}
+                    <div class="col day">
+                        <p>{{ f.day[5:] }}</p>
+                        <span class="col-badge {{ f['quality-class'] }}">
+                            {{ f.aqi }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="card-header">
+                <p class="location-name"> Bangkok air quality index</p>
+            </div>
+            <div class="card-body {{ BK_class }}">
+                <div class="row">
+                    <div class="col">
+                        <p class="day-value">{{ BK.date }}</p>
+                        <h2 class="aqi-value">{{ BK.aqi }}</h2>
+                        <br></br>
+                        <h4 class="aqi-status">{{ label[BK_class] }}</h4>
+                    </div>
+                    <div class="col">
+                        <span class="icon-{{ BK_class }}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    {% for f in BK.forecast %}
+                    <div class="col day">
+                        <p>{{ f.day[5:] }}</p>
+                        <span class="col-badge {{ f['quality-class'] }}">
+                            {{ f.aqi }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+</body>
