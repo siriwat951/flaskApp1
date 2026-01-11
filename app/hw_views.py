@@ -10,6 +10,8 @@ from flask import jsonify
 from app import app
 from flask import Flask, render_template
 from datetime import datetime
+from app.forms import forms
+
 
 
 def read_web_page(url):
@@ -346,3 +348,35 @@ def hw05_aqicard():
     }
 
     return render_template('hw05_aqicard.html', data=dataall)
+
+
+def read_file(filename, mode="rt"):
+    with open(filename, mode, encoding='utf-8') as fin:
+        return fin.read()
+
+def write_file(filename, contents, mode="wt"):
+    with open(filename, mode, encoding="utf-8") as fout:
+        fout.write(contents)
+
+@app.route('/hw06/register/', methods=('GET', 'POST'))
+def lab06_hw06_register():
+    form = forms.RegistrationForm()
+    if form.validate_on_submit():
+        raw_json = read_file('data/users.json')
+        users = json.loads(raw_json)
+        users.append({'username': form.username.data,
+                            'email': form.email.data,
+                            'password': form.password.data,
+                            'confirm_password': form.confirm_password.data,
+                            })
+        write_file('data/users.json',
+                   json.dumps(users, indent=4))
+        return redirect(url_for('lab06_hw06_users'))
+    return render_template('lab06/hw06_register.html', form=form)
+
+@app.route('/hw06/users/', methods=('GET', 'POST'))
+def lab06_hw06_users():
+    raw_json = read_file('data/users.json')
+    course_list = json.loads(raw_json)
+    return render_template('lab06/hw06_users.html', course_list=course_list)
+

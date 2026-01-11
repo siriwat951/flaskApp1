@@ -104,7 +104,7 @@ def lab06_index():
                             'level': form.level.data
                             })
         write_file('data/course_list.json',
-                   json.dumps(course_list, indent=4))
+                   json.dumps(course_list, indent=3))
         return redirect(url_for('lab06_courses'))
     return render_template('lab06/index.html', form=form)
 

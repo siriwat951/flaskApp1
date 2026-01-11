@@ -1,0 +1,11 @@
+{% extends 'lab06/base.html' %}
+{% block content %}
+  <h1>{% block title %} Courses {% endblock %}</h1>
+  <hr>
+  {% for course in course_list %}
+    <p> {{ course['username'] }} </p>
+    <p> {{ course['email'] }} </p>
+    <p> {{ course['password'] }}$ </p>
+    <hr>
+  {% endfor %}
+{% endblock %}
