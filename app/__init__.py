@@ -13,6 +13,7 @@ app.config['SECRET_KEY'] = \
     '179810bb56e3c78e5aa5d426aecf3e98432bbe3fd88cf0ac'
 
 app.config['DEBUG'] = True
+app.config['JSON_AS_ASCII'] = False
 
 @app.before_request
 def remove_trailing_slash():
