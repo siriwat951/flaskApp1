@@ -1,4 +1,6 @@
+import os
 from flask import Flask, request, redirect
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__, static_folder='static')
 app.url_map.strict_slashes = False
@@ -9,16 +11,21 @@ app.jinja_options.update({
     'lstrip_blocks': True
 })
 
-app.config['SECRET_KEY'] = \
-    '179810bb56e3c78e5aa5d426aecf3e98432bbe3fd88cf0ac'
-
 app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = \
+    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 app.config['JSON_AS_ASCII'] = False
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite://")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Creating an SQLAlchemy instance
+db = SQLAlchemy(app)
 
 @app.before_request
 def remove_trailing_slash():
    # Check if the path ends with a slash but is not the root "/"
     if request.path != '/' and request.path.endswith('/'):
-        return redirect(request.path[:-1], code=308)
+        return redirect(request.path[:-1], code=301)
 
 from app import views  # noqa
