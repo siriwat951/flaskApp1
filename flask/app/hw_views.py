@@ -8,8 +8,8 @@ from urllib.parse import quote
 from flask import (jsonify, render_template, request)
 from app import app
 import os
-from app import db, csrf
-from app.models import Anime, Genre
+import datetime
+from app.models.anime import Anime
 
 DEBUG = False
 
@@ -163,3 +163,96 @@ def anivault_api_add():
     db.session.add(new_anime)
     db.session.commit()
     return jsonify({'success': True, 'message': 'Successfully added to vault!'})
+
+
+@app.route('/anivault/api/rate', methods=['POST'])
+# @csrf.exempt
+def anivault_api_rate():
+   """
+   Updates the user rating for an anime.
+
+
+   [STUDENT IMPLEMENTATION GUIDE]
+   1. Get the JSON data from the request body.
+   2. Extract 'mal_id' and 'rating'.
+   3. Validate that both fields are present.
+      - If missing: return jsonify({'success': False,
+                                    'message': 'Missing mal_id or rating'}), 400
+   4. Query the Anime model to find the entry with the matching mal_id.
+      - If not found: return jsonify({'success': False,
+                                      'message': 'Anime not found'}), 404
+   5. If found, update the 'my_rating' field with the new value.
+   6. Commit the changes to the database.
+      - NOTE: For this lab, you do not need to handle complex transaction
+        isolation or dirty reads.
+        Assume a simple "last write wins" scenario.
+   7. Return a JSON success message:
+      - Success: return jsonify({'success': True,
+                                 'message': 'Rating updated!'}), 200
+   """
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False,
+                        'message': 'Missing mal_id or rating'}), 400
+
+    mal_id = anime_list.query.get(mal_id)
+    if not mal_id:
+        return jsonify({'success': False,
+                        'message': 'Anime not found'}), 404
+    else:
+        db.session.update('my_rating')
+        db.session.commit()
+        return jsonify({'success': True,
+                                 'message': 'Rating updated!'}), 200
+
+
+
+@app.route('/anivault/api/delete', methods=['POST'])
+# @csrf.exempt
+def anivault_api_delete():
+   """
+   Soft-deletes an anime from the collection.
+
+
+   [STUDENT IMPLEMENTATION GUIDE]
+   1. Get the JSON data from the request body.
+   2. Extract 'mal_id'.
+   3. Validate that 'mal_id' is present.
+      - If missing: 
+        return jsonify({'success': False, 'message': 'Missing mal_id'}), 400
+   4. Query the Anime model to find the entry with the matching mal_id.
+      - If not found: 
+        return jsonify({'success': False, 'message': 'Anime not found'}), 404
+   5. If found, set the 'deleted_at' field to the current timestamp
+      (datetime.utcnow()).
+      - DO NOT delete the row from the database!
+   6. Commit the changes to the database.
+   7. Return a JSON success message:
+      - Success: return jsonify({'success': True,
+                                 'message': 'Anime removed from collection'}), 200
+   """
+
+    result = request.get_json
+
+    id_ = result.get('mal_id', '')
+
+    if not id_:  # Validate ID
+        app.logger.error("Error: No ID provided for removal.")
+        return jsonify({'success': False, 'message': 'Missing mal_id'}), 400
+
+    try:
+
+        ainme = Anime.query.get(id_)
+        if not anime:
+            app.logger.error(f"Error: Contact with id {id_} not found.")
+            return jsonify({'success': False, 'message': 'Anime not found'}), 404
+
+        db.session.delete(anime)
+
+        db.session.commit()  # Commit if successful
+        return jsonify({'success': True,
+                        'message': 'Anime removed from collection'}), 200
+   pass
+
+
