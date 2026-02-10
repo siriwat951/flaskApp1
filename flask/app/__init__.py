@@ -14,7 +14,7 @@ app.jinja_options.update({
 
 app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = \
-    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    '222a79f58a0cf4012d0862a167646183395f28b4fbfdb9e4809e0da53d1e12df'
 app.config['JSON_AS_ASCII'] = False
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite://")
