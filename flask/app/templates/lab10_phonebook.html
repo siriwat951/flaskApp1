@@ -19,7 +19,10 @@
 
 <body>
   <div id="header" class="container">
-    <h1>Phonebook</h1>
+    <div class="box3">
+      <button id="logout" type="button">Logout</button>
+    </div>
+    <h1>{{ current_user.name }}'s Phonebook</h1>
   </div>
   <div id="add-edit" class="container" hidden="hidden">
     <h2 id="add-edit-caption">Add/Edit a Contact:</h2>
@@ -197,6 +200,10 @@
     $("#cancel_form").click(function () {
       clearForm();
       toggleView();
+    });
+    
+    $("#logout").click(function () {
+      window.location.href = "/lab11/logout";
     });
   </script>
 </body>

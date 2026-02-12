@@ -190,7 +190,7 @@ def anivault_api_rate():
       - Success: return jsonify({'success': True,
                                  'message': 'Rating updated!'}), 200
    """
-
+"""
     data = request.get_json()
     if not data:
         return jsonify({'success': False,
@@ -205,7 +205,7 @@ def anivault_api_rate():
         db.session.commit()
         return jsonify({'success': True,
                                  'message': 'Rating updated!'}), 200
-
+"""
 
 
 @app.route('/anivault/api/delete', methods=['POST'])
@@ -232,7 +232,7 @@ def anivault_api_delete():
       - Success: return jsonify({'success': True,
                                  'message': 'Anime removed from collection'}), 200
    """
-
+"""
     result = request.get_json
 
     id_ = result.get('mal_id', '')
@@ -254,5 +254,5 @@ def anivault_api_delete():
         return jsonify({'success': True,
                         'message': 'Anime removed from collection'}), 200
    pass
-
+"""
 
