@@ -51,11 +51,12 @@
                 <nav class="flex h-full gap-10">
                     <a class="{% if active_tab == 'search' %}relative inline-flex items-center h-full text-sm font-bold text-primary transition-colors{% else %}inline-flex items-center h-full text-sm font-bold text-slate-400 hover:text-primary transition-colors{% endif %}"
                         href="{{ url_for('anivault_mylist') }}">
-                        My List
+                        Collection
                         {% if active_tab == 'search' %}
                         <div class="absolute bottom-0 left-0 w-full h-[3px] bg-primary rounded-t-full"></div>
                         {% endif %}
                     </a>
+                    {% if not target_user %}
                     <a class="{% if active_tab == 'fetch' %}relative inline-flex items-center h-full text-sm font-bold text-primary transition-colors{% else %}inline-flex items-center h-full text-sm font-bold text-slate-400 hover:text-primary transition-colors{% endif %}"
                         href="{{ url_for('anivault_fetch') }}">
                         Fetch
@@ -63,17 +64,28 @@
                         <div class="absolute bottom-0 left-0 w-full h-[3px] bg-primary rounded-t-full"></div>
                         {% endif %}
                     </a>
+                    {% endif %}
                 </nav>
             </div>
             <div class="ml-auto flex items-center gap-4">
                 <div class="text-right">
-                    <p class="text-xs font-bold text-slate-700">Student Account</p>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-wider">Exam Period Active</p>
+                    <p class="text-xs font-bold text-slate-700">{{ current_user.name }}</p>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-wider">@{{ current_user.username }}</p>
                 </div>
                 <div
-                    class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200">
+                    class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 overflow-hidden">
+                    {% if current_user.avatar_url %}
+                    <img src="{{ current_user.avatar_url }}" alt="Avatar" class="w-full h-full object-cover">
+                    {% else %}
                     <span class="material-symbols-outlined text-xl">person</span>
+                    {% endif %}
                 </div>
+                <!-- TASK 1: Implement logout link here (href pointing to lab11_logout) -->
+                <a href="{{ url_for('lab11_logout') }}"
+                    class="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-red-500 transition-colors border border-slate-200"
+                    title="Logout">
+                    <span class="material-symbols-outlined text-xl">logout</span>
+                </a>
             </div>
         </div>
     </header>
@@ -82,8 +94,188 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Username Change Modal -->
+    <div id="username-modal" class="fixed inset-0 bg-slate-900/50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl transform transition-all scale-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Change Username</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">New Username</label>
+                    <div class="relative">
+                        <input type="text" id="new-username-input"
+                            class="block w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            placeholder="Enter new username">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span id="username-status-icon" class="material-symbols-outlined text-xl hidden"></span>
+                        </div>
+                    </div>
+                    <p id="username-helper" class="mt-1 text-xs text-slate-500">Pick a unique username.</p>
+                </div>
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button id="close-modal-btn"
+                        class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors">
+                        Cancel
+                    </button>
+                    <button id="save-username-btn" disabled
+                        class="px-4 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Grid.js JavaScript -->
     <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('username-modal');
+            const usernameDisplay = document.querySelector('.text-right'); // Target the container with name/username
+            const closeBtn = document.getElementById('close-modal-btn');
+            const saveBtn = document.getElementById('save-username-btn');
+            const input = document.getElementById('new-username-input');
+            const icon = document.getElementById('username-status-icon');
+            const helper = document.getElementById('username-helper');
+
+            let debounceTimer;
+
+            // Open Modal
+            usernameDisplay.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                input.value = '';
+                resetStatus();
+                input.focus();
+            });
+
+            // Add cursor pointer to indicate clickable
+            usernameDisplay.classList.add('cursor-pointer', 'hover:opacity-75', 'transition-opacity');
+
+            // Close Modal
+            closeBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            // Close on click outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.add('hidden');
+            });
+
+            // 3. Input validation with Debounce & AJAX
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.toLowerCase(); // Auto-lowercase
+                clearTimeout(debounceTimer);
+                const val = e.target.value.trim();
+
+                if (!val) {
+                    resetStatus();
+                    return;
+                }
+
+                // Regex: [a-z0-9_-], cannot start with _ or -
+                const usernameRegex = /^[a-z0-9][a-z0-9_-]*$/;
+                if (!usernameRegex.test(val)) {
+                    setFormatInvalid();
+                    return;
+                }
+
+                debounceTimer = setTimeout(async () => {
+                    helper.textContent = 'Checking availability...';
+                    helper.className = 'mt-1 text-xs text-slate-500';
+
+                    try {
+                        // TASK: Check username availability
+                        // TODO: Call the API to check if the username is available
+                        const res = await fetch("/anivault/api/check_username");
+
+                        const data = await res.json();
+                        setValid(data.available);
+                    } catch (err) {
+                        console.error('Check error:', err);
+                        helper.textContent = 'Error checking username.';
+                        helper.className = 'mt-1 text-xs text-red-500';
+                    }
+                }, 300);
+            });
+
+            // 4. Save Request with AJAX
+            saveBtn.addEventListener('click', async () => {
+                const newUsername = input.value.trim();
+                if (!newUsername) return;
+
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Saving...';
+
+                try {
+                    // TASK: Update username
+                    // TODO: Call the API to update the username.
+                    //       You need to provide the URL and the body (JSON stringified).
+                    const res = await fetch("/anivault/api/update_username", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '' // TODO: Fill in the CSRF token (Hint: use Jinja2 syntax)
+                        },
+                        // TODO: Fill in the body 
+                        body: JSON.stringify({ /* ... */ })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        throw new Error(data.message || 'Update failed');
+                    }
+                } catch (err) {
+                    console.error('Save error:', err);
+                    alert(err.message || 'An error occurred.');
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = 'Save Changes';
+                }
+            });
+
+            function resetStatus() {
+                icon.classList.add('hidden');
+                helper.textContent = 'Pick a unique username.';
+                helper.className = 'mt-1 text-xs text-slate-500';
+                saveBtn.disabled = true;
+                input.classList.remove('border-green-500', 'focus:border-green-500', 'border-red-500', 'focus:border-red-500');
+            }
+
+            function setFormatInvalid() {
+                icon.classList.remove('hidden');
+                icon.textContent = 'cancel';
+                icon.className = 'material-symbols-outlined text-xl text-red-500';
+                helper.textContent = 'Must start with a-z or 0-9. Only a-z, 0-9, _, - allowed.';
+                helper.className = 'mt-1 text-xs text-red-500';
+                input.classList.remove('border-green-500', 'focus:border-green-500');
+                input.classList.add('border-red-500', 'focus:border-red-500');
+                saveBtn.disabled = true;
+            }
+
+            function setValid(isValid) {
+                icon.classList.remove('hidden');
+                if (isValid) {
+                    icon.textContent = 'check_circle';
+                    icon.className = 'material-symbols-outlined text-xl text-green-500';
+                    helper.textContent = 'Username is available!';
+                    helper.className = 'mt-1 text-xs text-green-500';
+                    input.classList.remove('border-red-500', 'focus:border-red-500');
+                    input.classList.add('border-green-500', 'focus:border-green-500');
+                    saveBtn.disabled = false;
+                } else {
+                    icon.textContent = 'cancel';
+                    icon.className = 'material-symbols-outlined text-xl text-red-500';
+                    helper.textContent = 'Username is already taken.';
+                    helper.className = 'mt-1 text-xs text-red-500';
+                    input.classList.remove('border-green-500', 'focus:border-green-500');
+                    input.classList.add('border-red-500', 'focus:border-red-500');
+                    saveBtn.disabled = true;
+                }
+            }
+        });
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 

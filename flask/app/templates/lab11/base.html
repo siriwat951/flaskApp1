@@ -1,282 +1,85 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html>
 
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>{% block title %}AniVault{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link href="{{ url_for('static', filename='css/anivault.css') }}" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#6366f1",
-                        "background-light": "#fdfdfd",
-                    },
-                    fontFamily: {
-                        sans: ["Inter", "sans-serif"],
-                    },
-                },
-            },
-        };
-    </script>
-    <style type="text/tailwindcss">
-        @layer base {
-            .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        }
-    </style>
-    <!-- Grid.js CSS -->
-    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
-    {% block extra_style %}{% endblock %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab 12: Flask Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
 </head>
 
-<body class="flex flex-col min-h-screen">
-    <header class="bg-white border-b border-slate-200">
-        <div class="max-w-[1920px] mx-auto px-12 flex items-center h-[72px]">
-            <div class="flex items-center gap-12 h-full">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-                        <span class="material-symbols-outlined text-white text-xl filled-icon">movie_filter</span>
-                    </div>
-                    <span class="text-xl font-bold tracking-tight text-slate-800">AniVault</span>
-                </div>
-                <nav class="flex h-full gap-10">
-                    <a class="{% if active_tab == 'search' %}relative inline-flex items-center h-full text-sm font-bold text-primary transition-colors{% else %}inline-flex items-center h-full text-sm font-bold text-slate-400 hover:text-primary transition-colors{% endif %}"
-                        href="{{ url_for('anivault_mylist') }}">
-                        Collection
-                        {% if active_tab == 'search' %}
-                        <div class="absolute bottom-0 left-0 w-full h-[3px] bg-primary rounded-t-full"></div>
-                        {% endif %}
-                    </a>
-                    {% if not target_user %}
-                    <a class="{% if active_tab == 'fetch' %}relative inline-flex items-center h-full text-sm font-bold text-primary transition-colors{% else %}inline-flex items-center h-full text-sm font-bold text-slate-400 hover:text-primary transition-colors{% endif %}"
-                        href="{{ url_for('anivault_fetch') }}">
-                        Fetch
-                        {% if active_tab == 'fetch' %}
-                        <div class="absolute bottom-0 left-0 w-full h-[3px] bg-primary rounded-t-full"></div>
-                        {% endif %}
-                    </a>
-                    {% endif %}
-                </nav>
-            </div>
-            <div class="ml-auto flex items-center gap-4">
-                <div class="text-right">
-                    <p class="text-xs font-bold text-slate-700">{{ current_user.name }}</p>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-wider">@{{ current_user.username }}</p>
-                </div>
-                <div
-                    class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 overflow-hidden">
-                    {% if current_user.avatar_url %}
-                    <img src="{{ current_user.avatar_url }}" alt="Avatar" class="w-full h-full object-cover">
-                    {% else %}
-                    <span class="material-symbols-outlined text-xl">person</span>
-                    {% endif %}
-                </div>
-                <!-- TASK 1: Implement logout link here (href pointing to lab11_logout) -->
-                <a href="#"
-                    class="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-red-500 transition-colors border border-slate-200"
-                    title="Logout">
-                    <span class="material-symbols-outlined text-xl">logout</span>
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <main class="flex-1 w-full max-w-[1920px] mx-auto px-12 py-8 space-y-6">
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- Username Change Modal -->
-    <div id="username-modal" class="fixed inset-0 bg-slate-900/50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl transform transition-all scale-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Change Username</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">New Username</label>
-                    <div class="relative">
-                        <input type="text" id="new-username-input"
-                            class="block w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                            placeholder="Enter new username">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <span id="username-status-icon" class="material-symbols-outlined text-xl hidden"></span>
-                        </div>
-                    </div>
-                    <p id="username-helper" class="mt-1 text-xs text-slate-500">Pick a unique username.</p>
-                </div>
-                <div class="flex items-center justify-end gap-3 pt-2">
-                    <button id="close-modal-btn"
-                        class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors">
-                        Cancel
-                    </button>
-                    <button id="save-username-btn" disabled
-                        class="px-4 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        Save Changes
-                    </button>
-                </div>
-            </div>
-        </div>
+<body>
+  <section class="hero is-primary is-fullheight">
+    <div class="hero-head">
+     <nav class="navbar">
+       <div class="container ">
+         <div class="navbar-brand">
+           <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenuHeroA">
+             <span aria-hidden="true"></span>
+             <span aria-hidden="true"></span>
+             <span aria-hidden="true"></span>
+           </a>
+         </div>
+         <div id="navbarMenuHeroA" class="navbar-menu">
+           <div class="navbar-start">
+             <a href="{{ url_for('lab11_index') }}" class="navbar-item">
+               Home
+             </a>
+             {% if current_user.is_authenticated %}
+             <a href="{{ url_for('lab11_profile') }}" class="navbar-item">
+               Profile
+             </a>
+             {% endif %}
+           </div>
+           <div class="navbar-end">
+             {% if not current_user.is_authenticated %}
+             <a href="{{ url_for('lab11_login') }}" class="navbar-item">
+               Login
+             </a>
+             <a href="{{ url_for('lab11_signup') }}" class="navbar-item">
+               Sign Up
+             </a>
+             {% else %}
+             <img src="{{ current_user.avatar_url }}" width="52">
+             <a href="{{ url_for('lab11_logout') }}" class="navbar-item">
+               Logout
+             </a>
+             {% endif %}
+           </div>
+         </div>
+       </div>
+     </nav>
     </div>
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+  </section>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-    <!-- Grid.js JavaScript -->
-    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+      // Get all "navbar-burger" elements
+      const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('username-modal');
-            const usernameDisplay = document.querySelector('.text-right'); // Target the container with name/username
-            const closeBtn = document.getElementById('close-modal-btn');
-            const saveBtn = document.getElementById('save-username-btn');
-            const input = document.getElementById('new-username-input');
-            const icon = document.getElementById('username-status-icon');
-            const helper = document.getElementById('username-helper');
+     // Add a click event on each of them
+      $navbarBurgers.forEach(el => {
+        el.addEventListener('click', () => {
 
-            let debounceTimer;
+         // Get the target from the "data-target" attribute
+          const target = el.dataset.target;
+          const $target = document.getElementById(target);
 
-            // Open Modal
-            usernameDisplay.addEventListener('click', () => {
-                modal.classList.remove('hidden');
-                input.value = '';
-                resetStatus();
-                input.focus();
-            });
+          // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+          el.classList.toggle('is-active');
+          $target.classList.toggle('is-active');
 
-            // Add cursor pointer to indicate clickable
-            usernameDisplay.classList.add('cursor-pointer', 'hover:opacity-75', 'transition-opacity');
-
-            // Close Modal
-            closeBtn.addEventListener('click', () => {
-                modal.classList.add('hidden');
-            });
-
-            // Close on click outside
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.add('hidden');
-            });
-
-            // 3. Input validation with Debounce & AJAX
-            input.addEventListener('input', (e) => {
-                e.target.value = e.target.value.toLowerCase(); // Auto-lowercase
-                clearTimeout(debounceTimer);
-                const val = e.target.value.trim();
-
-                if (!val) {
-                    resetStatus();
-                    return;
-                }
-
-                // Regex: [a-z0-9_-], cannot start with _ or -
-                const usernameRegex = /^[a-z0-9][a-z0-9_-]*$/;
-                if (!usernameRegex.test(val)) {
-                    setFormatInvalid();
-                    return;
-                }
-
-                debounceTimer = setTimeout(async () => {
-                    helper.textContent = 'Checking availability...';
-                    helper.className = 'mt-1 text-xs text-slate-500';
-
-                    try {
-                        // TASK: Check username availability
-                        // TODO: Call the API to check if the username is available
-                        const res = await fetch(/* Fill in the API URL here */);
-
-                        const data = await res.json();
-                        setValid(data.available);
-                    } catch (err) {
-                        console.error('Check error:', err);
-                        helper.textContent = 'Error checking username.';
-                        helper.className = 'mt-1 text-xs text-red-500';
-                    }
-                }, 300);
-            });
-
-            // 4. Save Request with AJAX
-            saveBtn.addEventListener('click', async () => {
-                const newUsername = input.value.trim();
-                if (!newUsername) return;
-
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Saving...';
-
-                try {
-                    // TASK: Update username
-                    // TODO: Call the API to update the username.
-                    //       You need to provide the URL and the body (JSON stringified).
-                    const res = await fetch(/* Fill in the API URL here */, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '' // TODO: Fill in the CSRF token (Hint: use Jinja2 syntax)
-                        },
-                        // TODO: Fill in the body 
-                        body: JSON.stringify({ /* ... */ })
-                    });
-
-                    const data = await res.json();
-
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        throw new Error(data.message || 'Update failed');
-                    }
-                } catch (err) {
-                    console.error('Save error:', err);
-                    alert(err.message || 'An error occurred.');
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = 'Save Changes';
-                }
-            });
-
-            function resetStatus() {
-                icon.classList.add('hidden');
-                helper.textContent = 'Pick a unique username.';
-                helper.className = 'mt-1 text-xs text-slate-500';
-                saveBtn.disabled = true;
-                input.classList.remove('border-green-500', 'focus:border-green-500', 'border-red-500', 'focus:border-red-500');
-            }
-
-            function setFormatInvalid() {
-                icon.classList.remove('hidden');
-                icon.textContent = 'cancel';
-                icon.className = 'material-symbols-outlined text-xl text-red-500';
-                helper.textContent = 'Must start with a-z or 0-9. Only a-z, 0-9, _, - allowed.';
-                helper.className = 'mt-1 text-xs text-red-500';
-                input.classList.remove('border-green-500', 'focus:border-green-500');
-                input.classList.add('border-red-500', 'focus:border-red-500');
-                saveBtn.disabled = true;
-            }
-
-            function setValid(isValid) {
-                icon.classList.remove('hidden');
-                if (isValid) {
-                    icon.textContent = 'check_circle';
-                    icon.className = 'material-symbols-outlined text-xl text-green-500';
-                    helper.textContent = 'Username is available!';
-                    helper.className = 'mt-1 text-xs text-green-500';
-                    input.classList.remove('border-red-500', 'focus:border-red-500');
-                    input.classList.add('border-green-500', 'focus:border-green-500');
-                    saveBtn.disabled = false;
-                } else {
-                    icon.textContent = 'cancel';
-                    icon.className = 'material-symbols-outlined text-xl text-red-500';
-                    helper.textContent = 'Username is already taken.';
-                    helper.className = 'mt-1 text-xs text-red-500';
-                    input.classList.remove('border-green-500', 'focus:border-green-500');
-                    input.classList.add('border-red-500', 'focus:border-red-500');
-                    saveBtn.disabled = true;
-                }
-            }
         });
-    </script>
-    {% block extra_scripts %}{% endblock %}
+      });
+
+    });
+  </script>
 </body>
 
 </html>

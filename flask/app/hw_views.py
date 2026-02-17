@@ -2,7 +2,7 @@
 # 670510727
 # sec001
 
-iimport json
+import json
 import re
 from datetime import datetime
 from urllib.request import urlopen
@@ -34,6 +34,7 @@ def check_username_re(username):
 # TASK 2: Protected Routes
 @app.route("/anivault")
 # TODO: Task 2 - Add @login_required
+@login_required
 def anivault_mylist():
     return render_template("anivault/index.html", active_tab="search")
 
@@ -41,6 +42,7 @@ def anivault_mylist():
 # TASK 2: Protected Routes
 @app.route("/anivault/fetch")
 # TODO: Task 2 - Add @login_required
+@login_required
 def anivault_fetch():
     return render_template("anivault/fetch.html", active_tab="fetch")
 
@@ -108,7 +110,25 @@ def update_username():
     8. Return jsonify({'success': True}).
     """
     # [Task 4] Implement User Change Logic Here
-    pass
+        data = request.get_json()
+    new_username = request.args.get("username", "").strip().lower()
+    if not new_username:
+        return jsonify({'success': False, 'message': '...'}), 400
+
+    is_valid, msg = check_username_re(new_username)
+
+    if not is_valid:
+        return jsonify({'success': False, 'message': msg}), 400
+
+    existing = AuthUser.query.filter(
+        func.lower(AuthUser.username) == new_username
+    ).first()
+    if existing and existing.id != current_user.id:
+        return jsonify({'success': False, 'message': 'Username already taken'}), 400
+
+    current_user.username = new_username
+    db.session.commit()
+    return jsonify({'success': True}).
 
 
 # TASK 5: Filter Anime List
@@ -135,6 +155,7 @@ def anivault_api_list():
 @app.route("/anivault/api/jikan")
 @csrf.exempt
 # TODO: Task 2 - Add @login_required
+@login_required
 def anivault_api_jikan():
     """Searches the Jikan API (MyAnimeList) and returns mapped results."""
 
@@ -291,6 +312,7 @@ def anivault_api_add():
 @app.route("/anivault/api/rate", methods=["POST"])
 @csrf.exempt
 # TODO: Task 2 - Add @login_required
+@login_required
 def anivault_api_rate():
     """
     Updates the user rating for an anime.
@@ -322,7 +344,7 @@ def anivault_api_rate():
         rating = int(rating)
 
         # TODO: Task 6 - Check ownership (filter by mal_id AND owner_id)
-        anime = Anime.query.filter_by(mal_id=mal_id).first()
+        anime = Anime.query.filter_by(mal_id=mal_id, owner_id=current_user.id).first()
 
         if not anime:
             return (
@@ -348,6 +370,7 @@ def anivault_api_rate():
 @app.route("/anivault/api/delete", methods=["POST"])
 @csrf.exempt
 # TODO: Task 2 - Add @login_required
+@login_required
 def anivault_api_delete():
     """
     Soft-deletes an anime from the collection.
@@ -374,7 +397,7 @@ def anivault_api_delete():
         mal_id = int(mal_id)
 
         # TODO: Task 6 - Check ownership (filter by mal_id AND owner_id)
-        anime = Anime.query.filter_by(mal_id=mal_id).first()
+        anime = Anime.query.filter_by(mal_id=mal_id, owner_id=current_user.id).first()
 
         if not anime:
             return (
