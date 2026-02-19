@@ -11,6 +11,7 @@
     {% endif %}
     {% endwith %}
     <form method="POST">
+      {{ csrf_token() }}
       <div class="field">
         <div class="control">
           <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus="">
@@ -29,6 +30,17 @@
       </div>
       <button class="button is-block is-info is-large is-fullwidth">Login</button>
     </form>
+
+    <br/>
+    <!-- Google Login Button -->
+    <div class="field">
+      <a href="{{ url_for('google') }}" class="button is-large is-fullwidth">
+        <span class="icon">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" style="height: 20px;">
+        </span>
+        <span>Signin with Google</span>
+      </a>
+    </div>
   </div>
 </div>
 {% endblock %}
